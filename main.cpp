@@ -44,10 +44,17 @@ void stringFAM_example()
 	A.print_TRANSITION_FUNCTION();
 }
 
+void stringKMP_example ( )
+{
+	string_KMP A = string_KMP ( "ababaca" );
+	A.COMPUTE_PREFIX_FUNCTION ( );
+	A.printPi( );
+	system ( "pause" );
+}
 
 int main()
 {
-	stringFAM_example();
+	stringKMP_example ();
 
 	return 0;
 }

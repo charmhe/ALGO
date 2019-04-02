@@ -178,16 +178,46 @@ void string_FAM::TRANSITION_FUNCTION_Builder ()
 class string_KMP
 {
 public:
-	string s;
+	string P;
+	int m;
 	vector<int> pi;
 	string_KMP () { };
-	string_KMP (string S):s(S)
-	{
-		pi.resize(S)
-	};
+	string_KMP ( string S ) :P ( S ), m ( S.length ( ) ) { pi.resize ( m + 1, 0 ); } //The index started at 1.;
 
+	void COMPUTE_PREFIX_FUNCTION ( );
+	void printPi ( )
+	{
+		cout << "This pi function is:\n";
+		int size = pi.size ( );
+		int len = P.size ( );
+
+		//print i = 1 2 3 4 5...
+		for ( int i = 0; i < len; i++ )cout << i + 1 << " ";
+		cout << "\n";
+		//print characters
+		for ( int i = 0; i < len; i++ )cout << P[i] << " ";
+		cout << "\n";
+		//print p[i]
+		for ( int i = 1; i < size; i++ )cout << pi[i] << " ";
+
+	}
 
 };
+
+//TODO: incorrect???
+//To build this.pi. CLRS p1006
+void string_KMP::COMPUTE_PREFIX_FUNCTION ( )
+{
+	int k = 0;
+	for (int q = 2; q <= m; q++) 		
+	{
+		while ( k > 0 && P[k+1] != P[q] ) { k = pi[k]; }
+		if ( P[k + 1] == P[q] ) { k = k + 1; }
+		pi[q] = k;
+	}
+}
+
+
 
 
 #endif //ALGO_STRING_H
