@@ -11,6 +11,7 @@
 
 using namespace std;
 
+//Naive String Matcher.
 void Naive_String_Matcher ( string T, string P )
 {
 	unsigned long n = T.size();
@@ -39,11 +40,12 @@ void Naive_String_Matcher ( string T, string P )
 	cout << "END" << endl;
 }
 
-class string_FAM //string with FINITE-AUTOMATON-MATCHER
+//string with FINITE-AUTOMATON-MATCHER
+class string_FAM
 {
 public:
 	string s; //store the source string;
-	vector<char> alphabet;
+	vector<char> table;
 	int len_alphabet;
 	vector<vector<int>> states;  //to store the state transit function
 	string_FAM ()
@@ -52,7 +54,7 @@ public:
 	string_FAM ( string S ) : s(S)
 	{
 		alphabetBuilder();
-		len_alphabet = ( int ) alphabet.size();
+		len_alphabet = ( int ) table.size();
 	}
 
 //CLRS: p1001. COMPUTE-TRANSITION-FUNCTION()
@@ -70,7 +72,7 @@ public:
 		cout << "\n";
 		for ( int j = 0; j < len_alphabet; j++ )
 		{
-			cout << alphabet[j] << " ";
+			cout << table[j] << " ";
 			for ( int i = 0; i < size; i++ )
 			{
 				cout << states[i][j] << " ";
@@ -79,9 +81,10 @@ public:
 		}
 	}
 
-	void testPostfix(string s, string t, int i)
+
+	void testPostfix ( string s, string t, int i )
 	{
-		cout<<isPostfix(s, t, i)<<endl;
+		cout << isPostfix(s, t, i) << endl;
 	}
 
 private:
@@ -93,24 +96,24 @@ private:
 		for ( int i = 0; i < len; i++ )
 		{
 			char temp = s[i];
-			int len_alpha = ( int ) alphabet.size(); //Keep in mind: here the size of vector may change so you cannot use this.len_alphabet
+			int len_alpha = ( int ) table.size(); //Keep in mind: here the size of vector may change so you cannot use this.len_alphabet
 			for ( int j = 0; j < len_alpha; j++ )
 			{
-				if ( temp == alphabet[j] )
+				if ( temp == table[j] )
 				{
 					add = false;
 					break;
 				}
 			}
-			if ( add )alphabet.push_back(temp);
+			if ( add )table.push_back(temp);
 			else add = true;
 		}
 	}
 
 	bool isPostfix ( string S, string P, int i )//ver1.0, with i: check whether S is P's postfix, with i.
 	{
-		if (i == 0) return false;  //Key point
-		for ( int j = 0; j <= i; j++ )//No need to check '\0', so start at 1.
+		if ( i == 0 ) return false;  //Key point
+		for ( int j = 1; j <= i; j++ )//No need to check '\0', so start at 1.
 		{
 			if ( S[S.size() - j] != P[P.size() - j] )
 				return false;
@@ -120,7 +123,7 @@ private:
 
 	bool isPrefix ( string S, string P, int i )//ver1.0, with i: check whether S is P's postfix, with i.
 	{
-		if (i == 0) return false;  //Key point
+		if ( i == 0 ) return false;  //Key point
 		for ( int j = 0; j < i; j++ )//No need to check '\0', so start at 1.
 		{
 			if ( S[j] != P[j] )
@@ -130,35 +133,61 @@ private:
 	}
 };
 
+//CLRS: p1001. COMPUTE-TRANSITION-FUNCTION()
+//TODO: why it's always not correct?
 void string_FAM::TRANSITION_FUNCTION_Builder ()
 {
-	int m = s.length();
-	vector<int> v(len_alphabet + 1, 0);
-	states.resize(m + 1, v);
+	vector<int> v(table.size() + 1, 0);//for robustness
+	states.resize(s.length() + 1, v);
+	int m = static_cast<int>(s.length());
 
 	int k = 0;
 	string Pk, Pqa;
-	for ( int q = 0; q < m; q++ )
+	for ( int q = 0; q < m + 1; q++ )
 	{
 		for ( int j = 0; j < len_alphabet; j++ )
 		{
 			k = m + 1 > q + 2 ? q + 2 : m + 1;  //k = min (m + 1; q + 2)
 
-			while(1)
+			while ( true )
 			{
-				k = k - 1; if (k == 0 )break;
-				Pk = s.substr(s.size() - k,
-				              ( unsigned long ) k); //Pk is postfix, like "think", k = 2, then is "nk". for str.substr(a, b), a is start point, k is length
-				Pqa = s.substr(s.size() - q, q); //Why q is less 1 than k? think about it!
-				string temp = Pqa;
-				Pqa = Pqa + alphabet[j];
+				k = k - 1;
+//				Pk = s.substr(s.size() - k,
+//				              ( unsigned long ) k); //Pk is postfix, like "think", k = 2, then is "nk". for str.substr(a, b), a is start point, k is length
+//				Pqa = s.substr(s.size() - q, ( unsigned long ) q); //Why q is less 1 than k? think about it!
 
-				if(!isPostfix(Pk, Pqa, k)) break;
+				Pk = s.substr(0,
+				              ( unsigned long ) k); //Pk is postfix, like "think", k = 2, then is "nk". for str.substr(a, b), a is start point, k is length
+				Pqa = s.substr(0,
+				               ( unsigned long ) q); //Why q is less 1 than k? think about it!
+				Pqa += table[j];
+
+				if ( isPostfix(Pk, Pqa, k))
+					states[q][j] = k;//TODO: this is not true, I modified a little bit, but it works. Don't know why.
+				else break;
+
+//				if ( !isPrefix(Pk, Pqa, k)) break;//TODO: this is not true, I modified a little bit, but it works. Don't know why.
+//				else states[q][j] = k;
 			}
-			states[q][j] = k;
+
 		}
 	}
 }
+
+//KMP's algorithm
+class string_KMP
+{
+public:
+	string s;
+	vector<int> pi;
+	string_KMP () { };
+	string_KMP (string S):s(S)
+	{
+		pi.resize(S)
+	};
+
+
+};
 
 
 #endif //ALGO_STRING_H

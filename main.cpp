@@ -39,7 +39,7 @@ void stringAlgo_example()
 
 void stringFAM_example()
 {
-	string_FAM A = string_FAM("aabab");
+	string_FAM A = string_FAM("ababaca");
 	A.TRANSITION_FUNCTION_Builder();
 	A.print_TRANSITION_FUNCTION();
 }
