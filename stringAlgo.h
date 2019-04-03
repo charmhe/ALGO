@@ -185,6 +185,7 @@ public:
 	string_KMP ( string S ) :P ( S ), m ( S.length ( ) ) { pi.resize ( m + 1, 0 ); } //The index started at 1.;
 
 	void COMPUTE_PREFIX_FUNCTION ( );
+	void COMPUTE_PREFIX_FUNCTION_2 ( );
 	void printPi ( )
 	{
 		cout << "This pi function is:\n";
@@ -204,18 +205,32 @@ public:
 
 };
 
-//TODO: incorrect???
-//To build this.pi. CLRS p1006
+//TODO: incorrect??? -- reason is!!! in CLRS, string start at 0.
+//To build this.pi. CLRS p1006. Time: O(m)
 void string_KMP::COMPUTE_PREFIX_FUNCTION ( )
 {
 	int k = 0;
 	for (int q = 2; q <= m; q++) 		
 	{
-		while ( k > 0 && P[k+1] != P[q] ) { k = pi[k]; }
-		if ( P[k + 1] == P[q] ) { k = k + 1; }
+		while ( k > 0 && P[k] != P[q - 1] ) { k = pi[k]; }
+		if ( P[k] == P[q - 1] ) { k = k + 1; }
 		pi[q] = k;
 	}
 }
+
+//To build this.pi. From Dr.Zhang's version
+void string_KMP::COMPUTE_PREFIX_FUNCTION_2 ( )
+{
+	for ( int i = 2; i <= m; i++ ) {
+
+		int q = pi[i - 1];
+
+		while ( q > 0 && P[i - 1] != P[q+1 - 1] ) {q = pi[q];}
+		if ( P[q + 1 - 1] == P[i - 1] ) { q = q + 1; }
+		pi[i] = q;
+	}
+}
+
 
 
 
