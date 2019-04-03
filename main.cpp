@@ -11,6 +11,7 @@
 #include "heap.h"
 #include "queue.h"
 #include "stringAlgo.h"
+#include "dp.h"
 
 using namespace std;
 
@@ -54,9 +55,27 @@ void stringKMP_example ( )
 	system ( "pause" );
 }
 
+void dp_example()
+{
+	//test of CUT_ROD. Example from CLRS, p 360
+	map<int,int> ROD; //the price table of this rod.
+	ROD.insert (pair<int, int>(1, 1)); //a unit-long rod is $1.
+	ROD.insert (pair<int, int>(2, 5));
+	ROD.insert (pair<int, int>(3, 8));
+	ROD.insert (pair<int, int>(4, 9));
+	ROD.insert (pair<int, int>(5, 10));
+	ROD.insert (pair<int, int>(6, 17));
+	ROD.insert (pair<int, int>(7, 17));
+	ROD.insert (pair<int, int>(8, 20));
+	ROD.insert (pair<int, int>(9, 24));
+	ROD.insert (pair<int, int>(10, 30));//10-long rod is 30, but sometimes we cannot get a 10m rod. So in CUT_ROD_naive you can specify the length.
+
+	cout<<"The best price is: "<< CUT_ROD_naive(ROD, 9) <<endl;
+
+}
+
 int main()
 {
-	stringKMP_example ();
-
+	dp_example ();
 	return 0;
 }
