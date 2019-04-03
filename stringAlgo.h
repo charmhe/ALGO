@@ -186,7 +186,8 @@ public:
 
 	void COMPUTE_PREFIX_FUNCTION ( );
 	void COMPUTE_PREFIX_FUNCTION_2 ( );
-	void KMP_MATCHER ( string P );
+	void KMP_MATCHER ( string_KMP P );
+	void KMP_MATCHER_PrefixIncluded ( string_KMP P );
 	void printPi ( )
 	{
 		cout << "This next( ) is:\n";
@@ -250,31 +251,57 @@ void string_KMP::COMPUTE_PREFIX_FUNCTION_2 ( )
 }
 
 //CLRS p1005
-void string_KMP::KMP_MATCHER ( string P )
+void string_KMP::KMP_MATCHER ( string_KMP P )
 {
-	cout << "source string: \n" << T << endl << "match string:\n" << P << endl;
+	cout << "source string: \n" << T << endl << "matched string:\n" << P.T << endl;
 	
-	int n = m;
-	int mm = P.length ( );
-	COMPUTE_PREFIX_FUNCTION ( );
+	int n = m;//n = T.length
+	int mm = P.m;//P.length
+	P.COMPUTE_PREFIX_FUNCTION ( );
 	int q = 0;
 	for ( int i = 1; i <= n; i++ ) 		
 	{
-		while ( q > 0 && P[q + 1 - 1] != T[i - 1] ) {
-			q = pi[q];
+		while ( q > 0 && P.T[q + 1 - 1] != T[i - 1]) {
+			q = P.pi[q];
 		}
-		if ( P[q + 1 - 1] == T[i - 1] ) 
+		if ( P.T[q + 1 - 1] == T[i - 1] )
 		{
 			q = q + 1;
 		}
-		if ( q == mm ) 			{
+		if ( q == mm ) 			
+		{
 			cout << "Pattern occurs with shift " << i - mm << endl;
-			q = pi[q];
+			q = P.pi[q];
 		}
 	}
 }
 
+//author: Mu.H
+void string_KMP::KMP_MATCHER_PrefixIncluded ( string_KMP P )
+{
+	cout << "source string: \n" << T << endl << "match string:\n" << P.T << endl;
 
-
+	int n = m;//n = T.length
+	int mm = P.m;//P.length
+	P.COMPUTE_PREFIX_FUNCTION ( );
+	int q = 0;
+	int maxQ = q;
+	for ( int i = 1; i <= n; i++ ) {
+		while ( q > 0 && P.T[q + 1 - 1] != T[i - 1] ) {
+			q = P.pi[q];
+			cout << "Partial pattern occurs with shift " << i - 1 - maxQ << endl;
+			maxQ = q;
+		}
+		if ( P.T[q + 1 - 1] == T[i - 1] ) {
+			q = q + 1;
+			maxQ = q;
+		}
+		if ( q == mm ) {
+			cout << "Pattern occurs with shift " << i - mm << endl;
+			q = P.pi[q];
+			maxQ = q;
+		}
+	}
+}
 
 #endif //ALGO_STRING_H

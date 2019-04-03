@@ -46,8 +46,10 @@ void stringFAM_example()
 
 void stringKMP_example ( )
 {
-	string_KMP A = string_KMP ( "babbabbabbababbabb" );
-	A.KMP_MATCHER ( "bb" );
+	string_KMP A = string_KMP ( "babbcabbabcbababbacbb" );
+	A.KMP_MATCHER ( string_KMP ( "cb" ) );
+	A.KMP_MATCHER ( string_KMP ( "ca" ) );
+	A.KMP_MATCHER ( string_KMP ( "cccc" ) );
 	//A.printPi( );
 	system ( "pause" );
 }
