@@ -1,5 +1,5 @@
 //
-// Created by Charles on 2019-04-01.
+// Created by Charles.M.H on 2019-04-01.
 //
 
 #ifndef ALGO_STRING_H
@@ -178,28 +178,46 @@ void string_FAM::TRANSITION_FUNCTION_Builder ()
 class string_KMP
 {
 public:
-	string P;
+	string T;
 	int m;
 	vector<int> pi;
 	string_KMP () { };
-	string_KMP ( string S ) :P ( S ), m ( S.length ( ) ) { pi.resize ( m + 1, 0 ); } //The index started at 1.;
+	string_KMP ( string S ) :T ( S ), m ( S.length ( ) ) { pi.resize ( m + 1, 0 ); } //The index started at 1.;
 
 	void COMPUTE_PREFIX_FUNCTION ( );
 	void COMPUTE_PREFIX_FUNCTION_2 ( );
+	void KMP_MATCHER ( string P );
 	void printPi ( )
 	{
-		cout << "This pi function is:\n";
+		cout << "This next( ) is:\n";
+
 		int size = pi.size ( );
-		int len = P.size ( );
+		int len = T.size ( );
+
+		int wid = 3;
 
 		//print i = 1 2 3 4 5...
-		for ( int i = 0; i < len; i++ )cout << i + 1 << " ";
+		for ( int i = 0; i < len; i++ ) {
+			cout.setf ( ios::left );
+			cout.width ( wid );
+			cout << i + 1 << " ";
+		}
 		cout << "\n";
 		//print characters
-		for ( int i = 0; i < len; i++ )cout << P[i] << " ";
+		for ( int i = 0; i < len; i++ ) {
+			cout.setf ( ios::left );
+			cout.width ( wid );
+			cout << T[i] << " ";
+		}
 		cout << "\n";
 		//print p[i]
-		for ( int i = 1; i < size; i++ )cout << pi[i] << " ";
+		for ( int i = 1; i < size; i++ ) {
+			cout.setf ( ios::left );
+			cout.width ( wid );
+			cout << pi[i] << " ";
+		}
+
+		cout << "\n";
 
 	}
 
@@ -212,8 +230,8 @@ void string_KMP::COMPUTE_PREFIX_FUNCTION ( )
 	int k = 0;
 	for (int q = 2; q <= m; q++) 		
 	{
-		while ( k > 0 && P[k] != P[q - 1] ) { k = pi[k]; }
-		if ( P[k] == P[q - 1] ) { k = k + 1; }
+		while ( k > 0 && T[k] != T[q - 1] ) { k = pi[k]; }
+		if ( T[k] == T[q - 1] ) { k = k + 1; }
 		pi[q] = k;
 	}
 }
@@ -225,12 +243,36 @@ void string_KMP::COMPUTE_PREFIX_FUNCTION_2 ( )
 
 		int q = pi[i - 1];
 
-		while ( q > 0 && P[i - 1] != P[q+1 - 1] ) {q = pi[q];}
-		if ( P[q + 1 - 1] == P[i - 1] ) { q = q + 1; }
+		while ( q > 0 && T[i - 1] != T[q+1 - 1] ) {q = pi[q];}
+		if ( T[q + 1 - 1] == T[i - 1] ) { q = q + 1; }
 		pi[i] = q;
 	}
 }
 
+//CLRS p1005
+void string_KMP::KMP_MATCHER ( string P )
+{
+	cout << "source string: \n" << T << endl << "match string:\n" << P << endl;
+	
+	int n = m;
+	int mm = P.length ( );
+	COMPUTE_PREFIX_FUNCTION ( );
+	int q = 0;
+	for ( int i = 1; i <= n; i++ ) 		
+	{
+		while ( q > 0 && P[q + 1 - 1] != T[i - 1] ) {
+			q = pi[q];
+		}
+		if ( P[q + 1 - 1] == T[i - 1] ) 
+		{
+			q = q + 1;
+		}
+		if ( q == mm ) 			{
+			cout << "Pattern occurs with shift " << i - mm << endl;
+			q = pi[q];
+		}
+	}
+}
 
 
 
