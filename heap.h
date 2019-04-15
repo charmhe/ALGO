@@ -18,7 +18,7 @@ class heap
 public:
     vector<T> arr, sorted;
 	unsigned int size = 0;
-	heap(){ };
+	heap()= default;
 	heap (unsigned int i);
 	heap (initializer_list<T> param);
 	unsigned int parent (unsigned int i )
@@ -46,7 +46,9 @@ public:
 };
 
 template< class T >
-heap<T>::heap (unsigned int i):size(i) { }
+heap<T>::heap (unsigned int i):size(i) {
+	size = i;
+}
 
 template< class T >
 heap<T>::heap ( initializer_list<T> param )

@@ -1,13 +1,15 @@
 //
-// Created by Charles on 2019-04-03.
+// Created by Charles on 2019-03-10.
 //
 
 #ifndef ALGO_GRAPHALGO_H
 #define ALGO_GRAPHALGO_H
 
-#include <iostream>
+#include <iostream> 
 #include <cmath>
 #include <vector>
+
+#include "heap.h"
 
 using namespace std;
 
@@ -18,31 +20,21 @@ public:
 	vector<bool> aux;               //for DFS/BFS/ etc...
 	vector<vector <double>> weight; //for Single-Source Shortest-Paths/ etc...
 	vector<double> d;               //d[v] is an upper bound on the weight of a shortest path from source s to v.
-	vector<double> pi;              //π[v] is used to represent the shortest paths.
+	vector<pair<int, double>> pi;              //π[v] is used to represent the shortest paths.
+	vector<int> predecessor;        //predecessor is used in shortest map, to represent the shortest tree.
 	Graph( ) = default;
-	Graph (double **arr, int size);
+	Graph(int size);
+	Graph (double *arr, int size);
 	void DFS( );
 	void Single_Source_Shortest_Paths( );
 	bool Bellman_Ford(int s);// s is the start point.
-	bool Dijkstra(int s);
+	void Dijkstra(int s);
+	void relax(int from, int to, double weight);
 
 	//int** getMatrix( ); //get the matrix version of v.//TODO:
 
-	void print()
-	{
-		cout << "===========\n";
-		for(int i = 0; i < v.size(); i++)
-		{
-			cout << i << ": ";
-			for (int j = 0; j < v[i].size(); j++)
-			{
-				cout << v[i][j] << " ";
-			}
-			cout << endl;
-		}
-		cout << "===========\n";
-	}
-
+	void print();
+	void printTraceback();
 	void printPi();
 	void printWeight();
 
@@ -55,25 +47,97 @@ private:
 	void Relaxation (int u, int v);
 };
 
-Graph::Graph (double **arr, int size)
+Graph::Graph ( int size )
+{
+	vector <int> temp (0);
+
+	for(int i = 0; i < size; i++)
+	{
+		v.push_back(temp);
+	}
+
+
+}
+
+Graph::Graph (double *arr, int size)
 {
 	int size_row = size;
 	int size_col = size;
 
+	vector <int> temp (0);
+	vector <double> temp_2 (0);
+
 	for(int i = 0; i < size_row; i++)
 	{
-		vector <int> temp (0);
 		v.push_back(temp);
-		vector <double> temp_2 (0);
+
 		weight.push_back(temp_2);
+		pi.emplace_back(i, INFINITY);
 		for(int j = 0; j < size_col; j++)
 		{
-			if (arr[i][j] != 0){
+			if (*(arr + i* size + j) != 0){
 				v[i].push_back(j);
-				weight[i].push_back(arr[i][j]);
+				weight[i].push_back(*(arr + i* size + j));
 			}
 		}
 	}
+}
+
+void Graph::print ()
+{
+	cout << "===========\n";
+	for(int i = 0; i < v.size(); i++)
+	{
+		cout << i << ": ";
+		for (int j = 0; j < v[i].size(); j++)
+		{
+			cout << v[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << "===========\n";
+}
+
+void Graph::printPi()
+{
+	cout << "The start point to the this following point's shortest distance is:" <<endl;
+	cout << "===========\n";
+	unsigned long len_Pi = pi.size();
+	for (int i = 1; i < len_Pi; i++)
+	{
+		cout << " " << pi[i].second;
+	}
+	cout << endl;
+	cout << "===========\n";
+}
+
+void Graph::printWeight()
+{
+	cout << "===========\n";
+	unsigned long len_w = weight.size();
+	for (int i = 0; i < len_w; i++)
+	{
+		unsigned long len_E = weight[i].size();
+		cout << i << ": ";
+		for(int j = 0; j < len_E; j++)
+		{
+			cout << " " << weight[i][j];
+		}
+		cout << endl;
+	}
+	cout << "===========\n";
+}
+
+void Graph::printTraceback()
+{
+	cout << "===========\n";
+	unsigned long len_w = predecessor.size();
+	for (int i = 1; i < len_w; i++)
+	{
+		if(predecessor[i] == -1) cout << i << " -> " << "STOP" << ";\n";
+		else cout << i << " -> " << predecessor[i] << ";\n";
+	}
+	cout << "===========\n";
 }
 
 /*
@@ -120,9 +184,9 @@ void Graph::Initialization (int s)
 	for (int i = 0; i < len; i++)
 	{
 		d.push_back(INFINITY);
-		pi.push_back(INFINITY);
+		predecessor.push_back(-1);
 	}
-	d[s] = 0;
+	pi[s].second = 0;
 }
 //CLRS p649
 void Graph::Relaxation (int u, int v)
@@ -130,7 +194,7 @@ void Graph::Relaxation (int u, int v)
 	if(d[v] < d[u] + weight[u][v])
 	{
 		d[v] = d[u] + weight[u][v];
-		pi[v] = u;
+		pi[v].second = u;
 	}
 }
 
@@ -163,99 +227,31 @@ bool Graph::Bellman_Ford(int s)// s is the start point.
 	return true;
 }
 
-void Graph::printPi()
-{
-	unsigned long len_Pi = pi.size();
-	for (int i = 0; i < len_Pi; i++)
+void Graph::relax(int from, int to, double w){
+
+	if (pi[to].second > pi[from].second + w)
 	{
-		cout << " " << pi[i];
+		pi[to].second = pi[from].second + w;
+		predecessor[to] = from;
 	}
-	cout << endl;
 }
 
-void Graph::printWeight()
+
+void Graph::Dijkstra(int start)// s is the start point.
 {
-	unsigned long len_w = weight.size();
-	for (int i = 0; i < len_w; i++)
-	{
-		unsigned long len_E = weight[i].size();
-		for(int j = 0; j < len_E; j++)
-		{
-			cout << " " << weight[i][j];
+	Initialization(start);
+
+	heap_ASN q = heap_ASN(pi);
+
+	while (!q.isEmpty()) {
+		int u = q.extractMin();
+		int i = 0;
+		for (auto itr = v[u].begin(); itr != v[u].end(); itr++) {
+			relax(u, *itr, weight[u][i]);
+			i+=1;
+			q.decrease_key((*itr), pi[(*itr)].second);
 		}
-		cout << endl;
 	}
-}
-
-bool Graph::Dijkstra(int s)// s is the start point.
-{
-	Initialization(s);
-
-	vector<int> S;
-	vector<vector <int>>  Q = v;
-	while(Q.size()!=0)
-	{
-		
-	}
-
 }
 
 #endif //ALGO_GRAPHALGO_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

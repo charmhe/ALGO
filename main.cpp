@@ -7,11 +7,16 @@
  * */
 
 #include <iostream>
+#include <fstream>
+
 #include "heap.h"
 #include "queue.h"
 #include "stringAlgo.h"
 #include "rodcut_dp.h"
 #include "GraphAlgo.h"
+#include "heapasn.cpp"
+
+#define SIZE 10
 
 using namespace std;
 
@@ -20,6 +25,62 @@ void heap_example ()
 	heap<double> h = heap<double>({ 16, 4, 10, 14, 7, 9, 3, 2, 8, 1 });//example from CPRS v3 p155.
 	h.print();
 }
+
+void heap_ASN_example ()
+{
+//	heap_ASN h = heap_ASN({ 16, 4, 10, 14, 7, 9, 3, 2, 8, 1 });//example from CPRS v3 p155.
+//	h.print();
+//	h.decrease_key(3, 0);
+//	h.print();
+//	h.delete_min();
+//	h.print();
+//	cout << "--------" << endl;
+//	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+//
+//	//cout << h.delete_min() << endl;
+//	h.print();
+//	cout << h.isEmpty() << endl;
+}
+
+void heap_ASN_pair_version_example()
+{
+	heap_ASN h = heap_ASN({ pair<int, double>(1, 1.33),
+	                        pair<int, double>(2, 2.44),
+	                        pair<int, double>(3, 9.68),
+	                        pair<int, double>(4, 6.32),
+	                        pair<int, double>(5, 2.17),
+	                        pair<int, double>(6, 4.33),
+	                        pair<int, double>(7, 0.33),
+	                        pair<int, double>(8, 5.33),
+	                        pair<int, double>(9, 7.33)});
+	h.print();
+	h.decrease_key(2, 1);
+	h.print();
+	h.delete_min();
+	h.print();
+	cout << "--------" << endl;
+	cout << h.extractMin()<<" ";
+	cout << h.extractMin()<<" ";
+	cout << h.extractMin()<<" ";
+	cout << h.extractMin()<<" ";
+	cout << h.extractMin()<<" ";
+	cout << h.extractMin()<<" ";
+	cout << h.extractMin()<<" ";
+//	cout << h.extractMin()<<" ";
+
+	//cout << h.delete_min() << endl;
+	cout << "\nafter operation:" << endl;
+	h.print();
+	cout << h.isEmpty() << endl;
+
+};
 
 void queue_example ()
 {
@@ -124,9 +185,34 @@ void Graph_BellmanFord_Algo ()
 
 }
 
+void Graph_Dijstra ()
+{
+	fstream file("../fdata.txt");
+
+	int x, y, z;
+
+	file >> x;
+
+	double aux[SIZE][SIZE] = {0};
+
+	while(!file.eof())
+	{
+		file >> x >> y >> z;
+		aux[x][y] = z;
+	}
+
+	Graph g = Graph(*aux, SIZE);
+
+	g.print();
+
+	g.Dijkstra(9);
+	g.printPi();
+	g.printTraceback();
+}
+
 
 int main ()
 {
-	Graph_BellmanFord_Algo();
+	heap_ASN_pair_version_example();
 	return 0;
 }
